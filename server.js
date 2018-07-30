@@ -487,9 +487,7 @@ router.get('/auth/facebook/callback',
   });
 
   router.post('/register', function(req, res) {
-  
-    var hashedPassword = bcrypt.hashSync(req.body.password, 8);
-    
+    var hashedPassword = bcrypt.hashSync(req.body.password, 8);    
     User.create({
       username : req.body.name,
       email : req.body.email,
