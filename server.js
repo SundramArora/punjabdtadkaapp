@@ -8,7 +8,10 @@ var fs = require('fs');
 var morgan = require('morgan');
 var port = process.env.PORT || 8091;
 var mongoose = require('mongoose');
+var passport = require('passport');
+var passportjwt = require('passport-jwt');
 const jwt = require('jsonwebtoken')
+var bcrypt = require('bcryptjs');
 const tokenList = {}
 var passport          =     require('passport')
 var session           =     require('express-session')
@@ -21,12 +24,15 @@ var themesSchema = require('./app/models/themesSchema');
 mongoose.Promise = global.Promise;
 
 var mongooseConnections = {
-    "shared":mongoose.createConnection(config.sharedMongodbUrl)
+    "pdt":mongoose.createConnection(config.sharedMongodbUrl)
 };
 var clientSchema = require('./app/models/clientSchema');
 var user = require('./app/models/userSchema');
 
-var client = mongooseConnections["shared"].model('client', clientSchema);
+//var client = mongooseConnections["shared"].model('client', clientSchema);
+app.set('superSecret', config.secret); // secret variable
+
+app.use(express.static(__dirname + '/public'));
 
 app.use(bodyParser.urlencoded({
     extended: true,
@@ -53,58 +59,22 @@ var ObjectId = require('mongodb').ObjectID;
 
 var router = express.Router();
 
-app.use(function (req, res, next) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    //res.setHeader('Access-Control-Allow-Credentials', true);
-    var route = req.originalUrl.replace('/api/', '');
-    var index = route.indexOf('?');
-    route = route.substr(0, index);
-    if (whiteListRoutes.indexOf(req.originalUrl.replace('/api/', '')) > -1 || whiteListRoutes.indexOf(route) > -1) {
-        next();
-    }
-    // else if (req.method === 'POST') {
-    //     const bearerHeader = req.headers["authorization"];
-    //     if (typeof bearerHeader !== 'undefined') {
-    //         const bearer = bearerHeader.split(" ");
-    //         const bearerToken = bearer[1];
-    //         req.token = bearerToken;
-    //         jwt.verify(req.token, config.sessionSecret, function(err, data) {
-    //             if (err) {
-    //                 res.sendStatus(403);
-    //             }
-    //             else {
-    //                 req.body.clientId = data.clientId;
-    //                 req.body.sessionId = data.sessionId;
-    //                 next();
-    //             }
-    //         });
-    //     }
-    //     else res.sendStatus(403);
-    // }
-    // else if (req.method === 'GET') {
-    //     var token = req.query.token;
-    //     if (token === null || token === undefined) {
-    //         res.sendStatus(403);
-    //     }
-    //     else {
-    //         jwt.verify(token, config.sessionSecret, function(err, data) {
-    //             if (err) {
-    //                 res.sendStatus(403);
-    //             }
-    //             else {
-    //                 req.body.clientId = data.clientId;
-    //                 req.body.sessionId = data.sessionId;
-    //                 next();
-    //             }
-    //         });
-    //     }
-    // }
-    else {
-        next();
-    }
-});
+// app.use(function (req, res, next) {
+//     res.setHeader('Access-Control-Allow-Origin', '*');
+//     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+//     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+//     //res.setHeader('Access-Control-Allow-Credentials', true);
+//     var route = req.originalUrl.replace('/api/', '');
+//     var index = route.indexOf('?');
+//     route = route.substr(0, index);
+//     if (whiteListRoutes.indexOf(req.originalUrl.replace('/api/', '')) > -1 || whiteListRoutes.indexOf(route) > -1) {
+//         next();
+//     }
+    
+//     else {
+//         next();
+//     }
+// });
 
 
 app.use(session({ secret: 'keyboardcat', key: 'sid'}));
@@ -171,7 +141,7 @@ router.route('/saveBranding')
         var branding = req.body.branding;
         var variables = req.body.variables;
         var subdomain = req.body.subdomain;
-        var db = mongooseConnections['pdsBranding'].db;
+        var db = mongooseConnections['pdt'].db;
         gfs = Grid(db,mongoose.mongo);
         fs.writeFile('./uploads/' + subdomain + '.css', branding, function (err) {
             if (err) errorHandler(err, req, res)
@@ -226,7 +196,7 @@ router.route('/saveBranding')
 
 router.route("/getBrandingThemes")
     .get(function (req, res, next) {
-        var br = mongooseConnections['pdsBranding'];
+        var br = mongooseConnections['pdt'];
         var themes = br.model('themes', themesSchema);
 
         themes.find({}, function(err, themes) {
@@ -272,7 +242,7 @@ router.route('/loadProfile')
     .get(function (req, res, next) {
         var profile = req.query.profile;
         var subdomain = req.query.subdomain;
-        var db = mongooseConnections['pdsBranding'].db;
+        var db = mongooseConnections['pdt'].db;
         gfs = Grid(db,mongoose.mongo);
         gfs.readFile({ filename: profile + '.css', root: "pdsbrandingFiles" }, function (err, data) {
             gfs.remove({ filename: subdomain + '.css', root: "pdsbrandingFiles" }, function (e) {
@@ -398,6 +368,8 @@ router.post('/login', (req,res) => {
     res.status(200).json(response);
 })
 
+
+
 router.post('/token', (req,res) => {
     // refresh the damn token
     const postData = req.body
@@ -436,11 +408,42 @@ passport.use(new FacebookStrategy({
     profileFields: ['id', 'displayName', 'photos', 'email']
   },
   function(accessToken, refreshToken, profile, cb) {
-    User.findOrCreate({ facebookId: profile.id }, function (err, user) {
-      return cb(err, user);
-    });
-  }
-));
+    if (err)
+    return done(err);
+
+        // if the user is found, then log them in
+        if (user) {
+            return done(null, user); // user found, return that user
+        } 
+        else {
+            // if there is no user found with that facebook id, create them
+            var newUser            = new User();
+
+            // set all of the facebook information in our user model
+            newUser.facebook.id    = profile.id; // set the users facebook id                   
+            newUser.facebook.token = token; // we will save the token that facebook provides to the user                    
+            newUser.facebook.name  = profile.name.givenName + ' ' + profile.name.familyName; // look at the passport user profile to see how names are returned
+            newUser.facebook.email = profile.emails[0].value; // facebook can return multiple emails so we'll take the first
+
+            // save our user to the database
+            newUser.save(function(err) {
+                if (err)
+                    throw err;
+
+                // if successful, return the new user
+                return done(null, newUser);
+            });
+        }
+}
+)
+);
+
+
+//     User.findOrCreate({ username: profile.id }, function (err, user) {
+//       return cb(err, user);
+//     });
+//   }
+// ));
 
 //Passport Router
 router.get('/auth/facebook', passport.authenticate('facebook'));
@@ -452,6 +455,56 @@ router.get('/auth/facebook/callback',
   function(req, res) {
     res.redirect('/');
   });
+
+  router.get('/me', function(req, res) {
+    var token = req.headers['x-access-token'];
+    if (!token) return res.status(401).send({ auth: false, message: 'No token provided.' });
+    
+    jwt.verify(token, config.secret, function(err, decoded) {
+      if (err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+      
+      res.status(200).send(decoded);
+    });
+  });
+  app.use(morgan('dev'));
+
+  app.get('/setup', function(req, res) {
+    var hashedPassword = bcrypt.hashSync("sanjeev", 8);
+    // create a sample user
+    var nick = new User({ 
+      username: "9811635908", 
+      password: hashedPassword,
+      email: "superbsanju49@gmail.com"
+    });
+  
+    // save the sample user
+    nick.save(function(err) {
+      if (err) throw err;
+  
+      console.log('User saved successfully');
+      res.json({ success: true });
+    });
+  });
+
+  router.post('/register', function(req, res) {
+  
+    var hashedPassword = bcrypt.hashSync(req.body.password, 8);
+    
+    User.create({
+      username : req.body.name,
+      email : req.body.email,
+      password : hashedPassword
+    },
+    function (err, user) {
+      if (err) return res.status(500).send("There was a problem registering the user.")
+      // create a token
+      var token = jwt.sign({ id: user._id }, config.secret, {
+        expiresIn: 86400 // expires in 24 hours
+      });
+      res.status(200).send({ auth: true, token: token });
+    }); 
+  });
+
 router.get('/logout', function(req, res){
   req.logout();
   res.redirect('/');
@@ -461,12 +514,53 @@ function ensureAuthenticated(req, res, next) {
   res.redirect('/login')
 }
 
+app.use(function(req, res, next) {
+
+    // check header or url parameters or post parameters for token
+    var token = req.body.token || req.query.token || req.headers['x-access-token'];
+  
+    // decode token
+    if (token) {
+  
+      // verifies secret and checks exp
+      jwt.verify(token, app.get('superSecret'), function(err, decoded) {      
+        if (err) {
+          return res.json({ success: false, message: 'Failed to authenticate token.' });    
+        } else {
+          // if everything is good, save to request for use in other routes
+          req.decoded = decoded;    
+          next();
+        }
+      });
+  
+    } else {
+  
+      // if there is no token
+      // return an error
+      return res.status(403).send({ 
+          success: false, 
+          message: 'No token provided.' 
+      });
+  
+    }
+  });
+  
 
 
 if (process.env.NODE_ENV != 'development') {
     app.use(rollbar.errorHandler());
 }
 
+
+//var AuthController = require('./controller/auth');
+//app.use('/api/auth', AuthController);
+
 app.listen(port);
 console.log('Punjab d Tadka service running on port ' + port + ' in ' + process.env.NODE_ENV + ' mode');
-mongooseConnections["pdsBranding"] = mongoose.createConnection(config.mongodbUrl);
+mongooseConnections["pdt"] = mongoose.createConnection(config.mongodbUrl);
+mongoose.connect(config.mongodbUrl);
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function callback () {
+  console.log("h");
+});

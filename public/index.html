@@ -1,25 +1,38 @@
-<!doctype html>
-<html>
-<head>
-    <title>Node Authentication</title>
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> <!-- load bootstrap css -->
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
-    <style>
-        body        { padding-top:80px; }
-    </style>
-</head>
-<body>
-<div class="container">
 
-    <div class="jumbotron text-center">
-        <h1><span class="fa fa-lock"></span> Node Authentication</h1>
 
-        <p>Login or Register with:</p>
+<!DOCTYPE html>
 
-        <a href="/auth/facebook" class="btn btn-primary"><span class="fa fa-facebook"></span> Facebook</a>
+<html ng-app="myApp">
+    <base href="/">
+    <head>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 
-    </div>
 
-</div>
-</body>
-</html>   
+        <script src="https://code.angularjs.org/1.4.0-rc.1/angular.min.js"></script>
+        <script src="https://code.angularjs.org/1.4.0-rc.1/angular-route.min.js"></script>
+          <!--angular services  -->
+        <script src="app/auth/authService.js"></script>
+         <!--angular controllers  -->
+        <script src="app/controllers/mainController.js"></script>
+
+        <script src="app/app.routes.js"></script>
+        <script src="app/app.js"></script>
+    </head>
+
+    <body>
+        <div class="container">
+            <div ng-view></div>
+        </div>
+
+
+
+    </body>
+</html>
+
+
+
+
+
+
+
+
