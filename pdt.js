@@ -17,6 +17,10 @@ var jwtOptions = {}
 
 var config = require('./app/config/config');
 var userSchema = require('./app/models/userSchema');
+var companySchema = require('./app/models/companySchema');
+var branchSchema = require('./app/models/branchSchema');
+var categorySchema = require('./app/models/categorySchema');
+var subcategorySchema = require('./app/models/subCategorySchema');
 //var usersSchema = require('./app/models/usersSchema');
 
 
@@ -124,7 +128,7 @@ router.post("/login", function(req, res) {
     //var Users = mongooseConnections[pdt].model('staff', UserSchema);
     var Users = mongooseConnections[pdt].model('User', userSchema);
   var user;
-  Users.findOne({'username':username,'password': password}, 'username email firstName lastName roles', function(err,user)
+  Users.findOne({'username':username,'password': password}, 'username email name roles', function(err,user)
     {
         if(err)
         {
@@ -174,44 +178,59 @@ router.post("/login", function(req, res) {
 //     return this.hash === hash;
 //   };
   
-router.post("/register", function(req, res) {
-    if(req.body.username && req.body.password){
-      var username = req.body.username;
-      var password = req.body.password;
-   
-    console.log(username);
-    console.log(password);
-    // usually this would be a database call:
-    //var Users = mongooseConnections[pdt].model('staff', UserSchema);
-    var Users = mongooseConnections[pdt].model('User', userSchema);
-  var user;
-  Users.findOne({'username':username,'password': password}, 'username email firstName lastName roles', function(err,user)
-    {
-        if(err)
-        {
-        res.status(401).json({message:"no such user found"});        
-        }
-        if(user==null)
-        {
-            res.status(401).json({message:"User" + username + " and Password doesn't exist!"});
-        }
-    //user=user;
-    else
-    {
-       // if(user.password === password) {
-        // from now on we'll identify the user by the id and the id is the only personalized value that goes into our token
-        var payload = {id: user.id};
-        var token = jwt.sign(payload, jwtOptions.secretOrKey);
-        res.json({message: user, token: token});
-     // } else {
-     //   res.status(401).json({message:"passwords did not match"});
-      }
-
+  
+router.post("/saveCompany", function(req, res) {
+    if(req.body.companyName ){
+      var companyName = req.body.companyName;
+      var description = req.body.description;            
+    var address=req.body.address;
+    var email=req.body.email; 
+    var  pContactNo= req.body.pContactNo;
+    var contactNo=req.body.contactNo;    
+    var contactPerson= req.body.contactPerson;
     
-    });
+    var company = mongooseConnections[pdt].model('company', companySchema);
+
+
+
     }
-   
-  });
+});
+
+router.post("/saveItem", function(req, res) {
+    var Item = mongooseConnections[pdt].model('Item', userSchema);
+
+    if(req.body.name ){
+        
+        var item = new Item();
+           
+        item.name = req.body.name;
+        item.displayName= req.body.displayName;
+        item.description = req.body.description;    
+        item.quantity = req.body.quantity;
+        item.landingImage = req.body.landingImage;
+        item.images = req.body.images;
+        item.categoryId = req.body.categoryId;
+        item.subCategoryId = req.body.subCategoryId;
+        item.spiceLevel = req.body.spiceLevel;
+
+        item.save(function(err) {
+            if (err)
+            {                
+                res.status(401).json({message:err.message});  
+            }
+            else 
+            {
+               // var token;
+                //token = user.generateJwt();
+                res.status(200); 
+                //user.password = undefined;    
+                res.json({message: item});       
+            }
+        });
+
+    }
+});
+
 
 
   mongooseConnections[pdt] = mongoose.createConnection(config.mongodbUrl);
