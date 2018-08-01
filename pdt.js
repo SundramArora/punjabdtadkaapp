@@ -21,6 +21,7 @@ var companySchema = require('./app/models/companySchema');
 var branchSchema = require('./app/models/branchSchema');
 var categorySchema = require('./app/models/categorySchema');
 var subcategorySchema = require('./app/models/subCategorySchema');
+var itemSchema = require('./app/models/itemSchema');
 //var usersSchema = require('./app/models/usersSchema');
 
 
@@ -231,6 +232,38 @@ router.post("/saveItem", function(req, res) {
     }
 });
 
+var getToken = function (headers) {
+    if (headers && headers.authorization) {
+      var parted = headers.authorization.split(' ');
+      if (parted.length === 1) {
+        return parted[0];
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
+  };
+
+router.get("/getItems",  function(req, res) {
+    var token = getToken(req.headers);
+    if(token)
+    {
+        var Item = mongooseConnections[pdt].model('Item', itemSchema);
+        Item.find(function(err,items)
+        {
+            if(err)
+            {
+            res.status(401).json({message:"no such user found"});        
+            }
+            else 
+            { 
+                res.json({message: items});
+            }
+        });
+    }
+});
+
 
 
   mongooseConnections[pdt] = mongoose.createConnection(config.mongodbUrl);
@@ -238,7 +271,7 @@ router.post("/saveItem", function(req, res) {
   var db = mongoose.connection;
   db.on('error', console.error.bind(console, 'connection error:'));
   db.once('open', function callback () {
-    console.log("h");
+    console.log("Database Thums Up!");
   });
 
   app.use('/api', router);
