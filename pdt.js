@@ -22,8 +22,10 @@ var branchSchema = require('./app/models/branchSchema');
 var categorySchema = require('./app/models/categorySchema');
 var subcategorySchema = require('./app/models/subCategorySchema');
 var itemSchema = require('./app/models/itemSchema');
+var itemCartSchema = require('./app/models/itemCartSchema');
+var itemCartDetailsSchema = require('./app/models/itemCartDetailsSchema');
 //var usersSchema = require('./app/models/usersSchema');
-
+var dashboardSchema = require('./app/models/dashboardSchema');
 
 jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 jwtOptions.secretOrKey = config.secret;
@@ -87,6 +89,67 @@ app.get("/", function(req, res) {
 });
 
 var router = express.Router();
+
+
+var whiteListRoutes = ['/api','login','register'];
+//BEGIN ROUTING
+app.use(function (req, res, next) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Authorization, Origin, X-Requested-With, X-AUTHENTICATION, X-IP, Content-Type, Accept');
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  if (whiteListRoutes.indexOf(req.originalUrl.replace('/api/', '')) > -1) {
+      next();
+  }
+  // else if (req.method === 'POST') {
+  //     const bearerHeader = req.headers["authorization"];
+  //     if (typeof bearerHeader !== 'undefined') {
+  //         const bearer = bearerHeader.split(" ");
+  //         const bearerToken = bearer[1];
+  //         req.token = bearerToken;
+  //         jwt.verify(req.token, config.sessionSecret, function(err, data) {
+  //             if (err) {
+  //                 res.sendStatus(403);
+  //             }
+  //             else {
+  //                 req.body.clientId = data.clientId.toLowerCase();
+  //                 req.body.sessionId = data.sessionId;
+  //                 req.body.userName = data.userName;
+  //                 next();
+  //             }
+  //         });
+  //     }
+  //     else res.sendStatus(403);
+  // }
+  // else if (req.method === 'GET') {
+  //     var token = req.query.token;
+  //     if (token === null) {
+  //         res.sendStatus(403);
+  //     }
+  //     else {
+  //         jwt.verify(token, config.sessionSecret, function(err, data) {
+  //             if (err) {
+  //                 res.sendStatus(403);
+  //             }
+  //             else {
+  //                 req.body.clientId = data.clientId.toLowerCase();
+  //                 req.body.sessionId = data.sessionId;
+  //                 req.body.userName = data.userName;
+  //                 next();
+  //             }
+  //         });
+  //     }
+  // }
+  else {
+      next();
+  }
+});
+
+
+
+
+
+
 
 
 router.post("/register", function(req, res) {
@@ -198,16 +261,21 @@ router.post("/saveCompany", function(req, res) {
 });
 
 router.post("/saveItem", function(req, res) {
-    var Item = mongooseConnections[pdt].model('Item', userSchema);
+    var Item = mongooseConnections[pdt].model('Item', itemSchema);
 
-    if(req.body.name ){
+    if(req.body.name==null)
+    {
+      req.body =  JSON.stringify(req.body);
+    }
+    if(req.body.name)
+    {
         
         var item = new Item();
-           
+        item.itemId = req.body.itemId;
         item.name = req.body.name;
         item.displayName= req.body.displayName;
         item.description = req.body.description;    
-        item.quantity = req.body.quantity;
+        item.quantity =  req.body.quantity;
         item.landingImage = req.body.landingImage;
         item.images = req.body.images;
         item.categoryId = req.body.categoryId;
@@ -246,24 +314,88 @@ var getToken = function (headers) {
   };
 
 router.get("/getItems",  function(req, res) {
-    var token = getToken(req.headers);
-    if(token)
-    {
+    //var token = getToken(req.headers);
+   // if(token)
+    //{
         var Item = mongooseConnections[pdt].model('Item', itemSchema);
         Item.find(function(err,items)
         {
             if(err)
             {
-            res.status(401).json({message:"no such user found"});        
+            res.status(401).json({message:"no such Item found"});        
             }
             else 
             { 
                 res.json({message: items});
             }
         });
-    }
+    //}
 });
 
+router.get("/getDashboard",function(req,res) {
+var  dashboard = mongooseConnections[pdt].model('dashboard', dashboardSchema);
+dashboard.find(function(err,items)
+        {
+            if(err)
+            {
+            res.status(401).json({message:"no such Dashboard found"});        
+            }
+            else 
+            { 
+                res.json({message: items});
+            }
+        });
+
+} );
+
+function getNextSequenceValue(sequenceName){
+  var sequenceDocument = db.counters.findAndModify({
+  query:{_id: sequenceName },
+  update: {$inc:{sequence_value:1}},
+  new:true
+    });
+return sequenceDocument.sequence_value;
+}
+
+router.post("/addToCart", function(req, res) {
+  var ItemCart = mongooseConnections[pdt].model('ItemCart', itemCartSchema);
+
+  // if(req.body.name==null)
+  // {
+  //   req.body =  JSON.stringify(req.body);
+  // }
+  // if(req.body.name)
+  // {
+      
+      var item = new ItemCart();
+      item.itemCartId = getNextSequenceValue("itemCartId");
+      item.name = req.body.name;
+      item.displayName= req.body.displayName;
+      item.description = req.body.description;    
+      item.quantity =  req.body.quantity;
+      item.landingImage = req.body.landingImage;
+      item.images = req.body.images;
+      item.categoryId = req.body.categoryId;
+      item.subCategoryId = req.body.subCategoryId;
+      item.spiceLevel = req.body.spiceLevel;
+
+      item.save(function(err) {
+          if (err)
+          {                
+              res.status(401).json({message:err.message});  
+          }
+          else 
+          {
+             // var token;
+              //token = user.generateJwt();
+              res.status(200); 
+              //user.password = undefined;    
+              res.json({message: item});       
+          }
+      });
+
+  //}
+});
 
 
   mongooseConnections[pdt] = mongoose.createConnection(config.mongodbUrl);

@@ -7,6 +7,7 @@ var itemSchema = new Schema({
 "name" : String, 
 "displayName" : String, 
 "description" : String, 
+"isNonVeg": Boolean,
 "quantity" : [
     {
         "qtId" : Number, 
