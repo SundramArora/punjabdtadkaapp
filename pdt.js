@@ -10,6 +10,7 @@ var passportJWT = require("passport-jwt");
 var ExtractJwt = passportJWT.ExtractJwt;
 var JwtStrategy = passportJWT.Strategy;
 var crypto = require('crypto');
+var base64ToImage = require('base64-to-image');
 var pdt="pdt";
 var jwtOptions = {}
 //jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeader();
@@ -342,6 +343,21 @@ dashboard.find(function(err,items)
             }
             else 
             { 
+                for (var i=0;i<items.length;i++)
+                {
+
+                    var element = items[i];
+                    if (element.image!='')
+                    {
+                    var base64Str = element.image ;
+                    var path ='G:/ezifoods/punjabdtadkaapp/images/';
+                   // var path ='/images/';
+                    var optionalObj = {'fileName': element.type + '_' + element.did + '_' + Date.now() , 'type':'png'};
+                    var imageInfo = base64ToImage(base64Str,path,optionalObj);                     
+                    element.image = path + imageInfo.fileName;
+                    }
+                }
+
                 res.json({message: items});
             }
         });
