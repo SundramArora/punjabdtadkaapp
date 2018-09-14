@@ -398,6 +398,58 @@ router.post("/addToCart", function(req, res) {
 });
 
 
+
+     
+router.get("/GetItemsCategoryById",  function(req, res) {
+    var token = getToken(req.headers);
+    var cat=req.query.CatId
+    if(token)
+    {
+        var items = mongooseConnections[pdt].model('items', itemSchema);
+        items.find({"categoryId":cat},{'_id':0,'itemId':1,'name':1,'itemRatings.ratingLevel':1,'landingImage':1,"likes.isLike":1,"spiceLevel":1,"description":1,"quantity.display":1,"quantity.amount":1,"isNonVeg":1,"images.image":1},
+        function(err, item)
+         {
+            
+          if(err)
+            {
+            res.status(401).json({GetData:"no such user found"});
+            }
+            else
+            {
+              var i=0;
+              var LikeCount=0;
+              item.forEach(function(itemObj){
+                var totalrating=0;
+                var ratings=itemObj._doc.itemRatings;
+               
+                 ratings.forEach(function(rat){
+                  totalrating=totalrating+rat.ratingLevel;
+                 })
+                 itemObj._doc.avgRating=totalrating/ratings.length;
+               
+
+                 itemObj._doc.likes.forEach(function(lik){
+                   if(lik.isLike)
+                  LikeCount=LikeCount+1;
+                 });
+
+                 itemObj._doc.LikeCount=LikeCount;
+                 itemObj._doc.CategoryImageUrl=itemObj.images[0]._doc.image;
+                 delete itemObj._doc.itemRatings;
+                 delete itemObj._doc.likes;
+                 delete itemObj._doc.images;
+
+                  
+              })
+              
+              res.json({GetData: item});
+            }
+        });
+    }
+});
+
+
+
   mongooseConnections[pdt] = mongoose.createConnection(config.mongodbUrl);
   mongoose.connect(config.mongodbUrl);
   var db = mongoose.connection;

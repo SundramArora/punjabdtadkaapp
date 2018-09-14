@@ -26,7 +26,7 @@ var itemSchema = new Schema({
 ], 
 "categoryId" : Number, 
 "subCategoryId" : Number, 
-"spiceLevel" : String, 
+"spiceLevel" : Number, 
 "deliveryRatings" : [
     {
         "userId" : String, 
