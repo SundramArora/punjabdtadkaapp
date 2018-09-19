@@ -6,11 +6,15 @@ var jwt = require('jsonwebtoken');
 var mongoose = require('mongoose');
 var passport = require("passport");
 var passportJWT = require("passport-jwt");
-
+var publicDir = require('path').join(__dirname,'/images/').replace(/\\/g, "/");
+var findRemoveSync = require('find-remove')
+// var logger = require('E:/Github/punjabdtadkaapp/logger').Logger;
+var logger = require(__dirname+'/logger').Logger;
 var ExtractJwt = passportJWT.ExtractJwt;
 var JwtStrategy = passportJWT.Strategy;
 var crypto = require('crypto');
 var base64ToImage = require('base64-to-image');
+var fs = require('fs');
 var pdt="pdt";
 var jwtOptions = {}
 //jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeader();
@@ -417,23 +421,28 @@ router.post("/addToCart", function(req, res) {
 
      
 router.get("/GetItemsCategoryById",  function(req, res) {
-    var token = getToken(req.headers);
+   // var token = getToken(req.headers);
     var cat=req.query.CatId
-    if(token)
-    {
+    var userId=req.query.UserId
+   // if(token)
+  //  {
+      
         var items = mongooseConnections[pdt].model('items', itemSchema);
-        items.find({"categoryId":cat},{'_id':0,'itemId':1,'name':1,'itemRatings.ratingLevel':1,'landingImage':1,"likes.isLike":1,"spiceLevel":1,"description":1,"quantity.display":1,"quantity.amount":1,"isNonVeg":1,"images.image":1},
+        items.find({"categoryId":cat,"likes.userId":userId},
+        {'_id':0,'itemId':1,'name':1,'itemRatings.ratingLevel':1,'landingImage':1,"likes.isLike":1,"likes.isFavorite":1,"likes.userfullname":1,"spiceLevel":1,"description":1,"quantity.display":1,"quantity.amount":1,"isNonVeg":1,"images.image":1,"companyId":1,"branchId":1},
         function(err, item)
          {
             
           if(err)
             {
+                logger.error('Methode : GetItemsCategoryById And Showing Error : - '+err);
             res.status(401).json({GetData:"no such user found"});
             }
             else
             {
               var i=0;
               var LikeCount=0;
+              var result = findRemoveSync(publicDir, {age: {seconds: 86400}, extensions: ['.webp','.png','.jpg','.JPG','.gif'], limit: 10})//
               item.forEach(function(itemObj){
                 var totalrating=0;
                 var ratings=itemObj._doc.itemRatings;
@@ -451,19 +460,100 @@ router.get("/GetItemsCategoryById",  function(req, res) {
 
                  itemObj._doc.LikeCount=LikeCount;
                  itemObj._doc.CategoryImageUrl=itemObj.images[0]._doc.image;
+                 itemObj._doc.isLike=itemObj.likes[0]._doc.isLike;
+                 itemObj._doc.isFavorite=itemObj.likes[0]._doc.isFavorite; 
+                 itemObj._doc.UserName=itemObj.likes[0]._doc.userfullname; 
+                 
+                 if (itemObj.landingImage!='')
+                     {
+                      var base64Str = itemObj.landingImage ;
+                      var optionalObj = {'fileName': itemObj.name.replace(/ /g, "_") + '_' + Date.now() , 'type':'webp'};
+                      var imageInfo = base64ToImage(base64Str,publicDir,optionalObj);                     
+                      itemObj._doc.landingImage = '/images/' + imageInfo.fileName;
+                     }
+                
                  delete itemObj._doc.itemRatings;
                  delete itemObj._doc.likes;
                  delete itemObj._doc.images;
-
+                     
                   
               })
               
               res.json({GetData: item});
             }
         });
-    }
+   // }
 });
 
+router.get("/GetItemById",  function(req, res) {
+    // var token = getToken(req.headers);
+     var Itemid=req.query.Itemid
+     var userId=req.query.UserId
+    // if(token)
+   //  {
+       
+         var items = mongooseConnections[pdt].model('items', itemSchema);
+         items.find({"itemId": Itemid ,"likes.userId":userId},
+         {'_id':0,'name':1,'itemRatings.ratingLevel':1,'landingImage':1,"likes.isLike":1,"likes.isFavorite":1,"likes.userfullname":1,"spiceLevel":1,"description":1,"quantity.display":1,"quantity.amount":1,"isNonVeg":1,"images.image":1,"companyId":1,"branchId":1,"comments":1},
+         function(err, item)
+          {
+             
+           if(err)
+             {
+
+                logger.error('Methode : GetItemById And Showing Error : - '+err);
+             res.status(401).json({GetData:"no such user found"});
+             }
+             else
+             {
+                //logger.info("Test Message");
+                
+               var i=0;
+               var LikeCount=0;
+
+               var result = findRemoveSync(publicDir, {age: {seconds: 86400}, extensions: ['.webp','.png','.jpg','.JPG','.gif'], limit: 10})
+               item.forEach(function(itemObj){
+                 var totalrating=0;
+                 var ratings=itemObj._doc.itemRatings;
+                
+                  ratings.forEach(function(rat){
+                   totalrating=totalrating+rat.ratingLevel;
+                  })
+                  itemObj._doc.avgRating=totalrating/ratings.length;
+                
+ 
+                  itemObj._doc.likes.forEach(function(lik){
+                    if(lik.isLike)
+                   LikeCount=LikeCount+1;
+                  });
+ 
+                  itemObj._doc.LikeCount=LikeCount;
+                  itemObj._doc.CategoryImageUrl=itemObj.images[0]._doc.image;
+                  itemObj._doc.isLike=itemObj.likes[0]._doc.isLike;
+                  itemObj._doc.isFavorite=itemObj.likes[0]._doc.isFavorite; 
+                  itemObj._doc.UserName=itemObj.likes[0]._doc.userfullname; 
+                  
+                  if (itemObj.landingImage!='')
+                      {
+                      var base64Str = itemObj.landingImage ;
+                      var optionalObj = {'fileName': itemObj.name.replace(/ /g, "_") + '_' + Date.now() , 'type':'webp'};
+                      var imageInfo = base64ToImage(base64Str,publicDir,optionalObj);                     
+                      itemObj._doc.landingImage = '/images/' + imageInfo.fileName;
+                      }
+                 
+                  delete itemObj._doc.itemRatings;
+                  delete itemObj._doc.likes;
+                  delete itemObj._doc.images;
+                      
+                   
+               })
+               
+               res.json({GetData: item});
+             }
+         });
+    // }
+ });
+ 
 
 
   mongooseConnections[pdt] = mongoose.createConnection(config.mongodbUrl);
@@ -475,7 +565,7 @@ router.get("/GetItemsCategoryById",  function(req, res) {
   });
 
   app.use('/api', router);
-
+  app.use('/images',express.static(publicDir));
   var port = process.env.PORT || 8091;
   app.listen(port);
 console.log('Punjab d Tadka service running on port ' + port ) ; //+ ' in ' + process.env.NODE_ENV + ' mode');

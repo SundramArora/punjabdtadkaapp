@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var branchSchema = new Schema({
+    branchId: String,
     branchName: String,
     address:String,
     email:String, 
