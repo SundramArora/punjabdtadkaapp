@@ -394,7 +394,7 @@ router.post('/token', (req,res) => {
 router.use(require('./tokenChecker'))
 
 router.get('/secure', (req,res) => {
-    // all secured routes goes here
+    // all secured routes goes here//////////////
     res.send('I am secured...')
 })
 

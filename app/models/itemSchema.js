@@ -29,7 +29,7 @@ var itemSchema = new Schema({
 "spiceLevel" : Number, 
 "deliveryRatings" : [
     {
-        "userId" : Number, 
+        "username" : Number, 
         "userfullname" : String, 
         "ratingLevel" : String, 
         "orderId" : Number
@@ -37,7 +37,7 @@ var itemSchema = new Schema({
 ], 
 "itemRatings" : [
     {
-        "userId" :Number, 
+        "username" :Number, 
         "userfullname" : String, 
         "ratingLevel" : String
     }
@@ -53,7 +53,7 @@ var itemSchema = new Schema({
 ], 
 "likes" : [
     {
-        "userId" : Number, 
+        "username" : Number, 
         "userfullname" : String, 
         "isLike" : Boolean,
         "isFavorite" : Boolean,
@@ -61,13 +61,13 @@ var itemSchema = new Schema({
 ], 
 "comments" : [
     {
-        "userId" : Number, 
+        "username" : Number, 
         "userfullname" : String, 
         "comment" : String, 
         "commentDate" : Date, 
         "commentLikes" : [
             {
-                "userId" : Number, 
+                "username" : Number, 
                 "userfullname" : String, 
                 "isLike" : Boolean
             }

@@ -16,8 +16,8 @@ var infoStream = fs.createWriteStream('logs/info.txt');
 // Notice we set the path of our log files in the first parameter of 
 // fs.createWriteStream. This could easily be pulled in from a config
 // file if needed.
-  
-var errorStream = fs.createWriteStream('logs/error.txt');
+
+
 // createWriteStream takes in options as a second, optional parameter
 // if you wanted to set the file encoding of your output file you could
 // do so by setting it like so: ('logs/debug.txt' , { encoding : 'utf-8' });
@@ -44,6 +44,22 @@ Logger.debug = function(msg) {
 };
 
 Logger.error = function(msg) {
-  var message = new Date().toISOString() + " : " + msg + "\n";
-  errorStream.write(message);
+          var message ="\n"+ new Date() + " : - " + msg + "\n";
+          var d=new Date()
+          var month=d.getMonth()+1;
+          var errologfilepath='logs/error`'+d.getDate()+'`'+ month+'`'+d.getFullYear()+'`.txt';//`'+d.getHours()+'`'+d.getMinutes()+'`'+d.getSeconds()+'
+
+          if (!fs.existsSync(errologfilepath)) {
+              fs.createWriteStream(errologfilepath).write(message);
+                  }
+          else{
+          fs.appendFile(errologfilepath, message, function (err) {
+                                                                      if (err) {
+                                                                        // append failed
+                                                                      } else {
+                                                                        // done
+                                                                      }
+                                                                    });
+              }
+  
 };

@@ -7,9 +7,11 @@ var itemCartDetailsSchema = new Schema({
     "itemCartId" : Number, 
     "itemId" : Number, 
     "Amount" : Number, 
-    "discountId" : Number, 
-    "discountAmount" : Number    
+    "discountApplied" : Number, 
+    "discountAmount" : Number,
+    "itemQuantity":Number   
 }
 , { collection: 'itemCartDetails' });
 
 module.exports = itemCartDetailsSchema;
+

@@ -7,7 +7,7 @@ var Schema = mongoose.Schema;
 
 var UserSchema = new Schema({
         //_id: String,
-        
+        UserId:Number,
         name: String,        
         email: {
             type: String,
@@ -28,6 +28,10 @@ var UserSchema = new Schema({
             }],
             country: []
         }],
+        isOtpVerified:{
+            type:Boolean,
+            default:false
+        },
         provider: String,
         isActive: Boolean,   
         salt: String,

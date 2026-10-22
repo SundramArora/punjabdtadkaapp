@@ -2,7 +2,20 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var itemCartSchema = new Schema({
-    "itemCartId" : String, 
+    "itemDetails":[
+        {
+            "itemId" : Number, 
+            "Amount" : Number, 
+            "discountApplied" : Number, 
+            "discountAmount" : Number,
+            "itemQuantity":Number   
+    }
+    ],
+    "couponApplied": Number,
+    "totalAmountPaid": Number,
+    "taxPaid": Number,
+    "OrderId":Number,
+    "itemCartId" : Number, 
     "itemCartDate" : Date, 
     "itemTotal" : Number, 
     "discountId" : Number,
@@ -18,7 +31,10 @@ var itemCartSchema = new Schema({
     ], 
     "taxesTotal" : Number, 
     "NetTotal" : Number, 
-    "userId" : Number
+    "orderStatus":String,
+    "paymentMethod":String,
+    "userId" : Number,
+    "username":Number
 }
 , { collection: 'itemCart' });
 

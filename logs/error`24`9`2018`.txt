@@ -1,0 +1,106 @@
+
+Wed Oct 24 2018 14:37:49 GMT+0530 (India Standard Time) : - Error: Url is Not Match ...!!!!
+
+Wed Oct 24 2018 14:56:20 GMT+0530 (India Standard Time) : - Error: Url is Not Match ...!!!!
+
+Wed Oct 24 2018 14:56:27 GMT+0530 (India Standard Time) : - Error: Url is Not Match ...!!!!
+
+Wed Oct 24 2018 14:56:32 GMT+0530 (India Standard Time) : - Error: Url is Not Match ...!!!!
+
+Wed Oct 24 2018 14:56:33 GMT+0530 (India Standard Time) : - Error: Url is Not Match ...!!!!
+
+Wed Oct 24 2018 14:56:33 GMT+0530 (India Standard Time) : - Error: Url is Not Match ...!!!!
+
+Wed Oct 24 2018 14:56:33 GMT+0530 (India Standard Time) : - Error: Url is Not Match ...!!!!
+
+Wed Oct 24 2018 14:56:33 GMT+0530 (India Standard Time) : - Error: Url is Not Match ...!!!!
+
+Wed Oct 24 2018 14:56:34 GMT+0530 (India Standard Time) : - Error: Url is Not Match ...!!!!
+
+Wed Oct 24 2018 14:56:34 GMT+0530 (India Standard Time) : - Error: Url is Not Match ...!!!!
+
+Wed Oct 24 2018 14:56:34 GMT+0530 (India Standard Time) : - Error: Url is Not Match ...!!!!
+
+Wed Oct 24 2018 14:56:34 GMT+0530 (India Standard Time) : - Error: Url is Not Match ...!!!!
+
+Wed Oct 24 2018 14:56:34 GMT+0530 (India Standard Time) : - Error: Url is Not Match ...!!!!
+
+Wed Oct 24 2018 15:48:13 GMT+0530 (India Standard Time) : - TypeError: FavoriteItem is not a constructor
+
+Wed Oct 24 2018 15:50:08 GMT+0530 (India Standard Time) : - TypeError: FavoriteItem is not a constructor
+
+Wed Oct 24 2018 15:52:34 GMT+0530 (India Standard Time) : - TypeError: item.likes.save is not a function
+
+Wed Oct 24 2018 15:58:09 GMT+0530 (India Standard Time) : - TypeError: item.save is not a function
+
+Wed Oct 24 2018 16:00:27 GMT+0530 (India Standard Time) : - TypeError: item.save is not a function
+
+Wed Oct 24 2018 16:06:35 GMT+0530 (India Standard Time) : - TypeError: likes is not a constructor
+
+Wed Oct 24 2018 16:07:39 GMT+0530 (India Standard Time) : - ReferenceError: likes is not defined
+
+Wed Oct 24 2018 16:08:22 GMT+0530 (India Standard Time) : - ReferenceError: likes is not defined
+
+Wed Oct 24 2018 16:09:54 GMT+0530 (India Standard Time) : - TypeError: item is not a constructor
+
+Wed Oct 24 2018 16:46:00 GMT+0530 (India Standard Time) : - MongooseError: No _id found on document!
+
+Wed Oct 24 2018 16:47:16 GMT+0530 (India Standard Time) : - MongoError: Performing an update on the path '_id' would modify the immutable field '_id'
+
+Wed Oct 24 2018 16:50:07 GMT+0530 (India Standard Time) : - TypeError: item.updateone is not a function
+
+Wed Oct 24 2018 16:51:31 GMT+0530 (India Standard Time) : - MongooseError: No _id found on document!
+
+Wed Oct 24 2018 17:06:15 GMT+0530 (India Standard Time) : - TypeError: Cannot set property 'likes' of undefined
+
+Wed Oct 24 2018 18:03:13 GMT+0530 (India Standard Time) : - TypeError: Cannot set property 'likes' of undefined
+
+Wed Oct 24 2018 18:04:47 GMT+0530 (India Standard Time) : - TypeError: Cannot set property 'likes' of undefined
+
+Wed Oct 24 2018 19:05:13 GMT+0530 (India Standard Time) : - MongoError: Cannot create field 'username' in element {likes: [ { userId: 1, userfullname: "Sundram Arora", isLike: true, isFavorite: true }, { _id: ObjectId('5bd06e0a21c7f22d70c90509'), username: 8447531864.0, userfullname: "Sundram Arora", isLike: true, isFavorite: true }, null, { _id: ObjectId('5bd06e5b8c77e533ac4390eb'), username: 8447531864.0, userfullname: "Sundram Arora", isLike: true, isFavorite: true }, null, { _id: ObjectId('5bd06e768c77e533ac4390ed'), username: 844753, userfullname: "Sundram ", isLike: true, isFavorite: true }, null, { _id: ObjectId('5bd06e8c8c77e533ac4390ef'), username: 844753, userfullname: "Sundram ", isLike: true, isFavorite: true }, { _id: ObjectId('5bd06eadb8e4262520897b6c'), username: 844753, userfullname: "Sundram ", isLike: true, isFavorite: true }, { _id: ObjectId('5bd06eaeb8e4262520897b6e'), username: 844753, userfullname: "Sundram ", isLike: true, isFavorite: true }, { _id: ObjectId('5bd06ebcb8e4262520897b70'), username: 844753, userfullname: "Sundram ", isLike: true, isFavorite: true } ]}
+
+Wed Oct 24 2018 19:41:03 GMT+0530 (India Standard Time) : - TypeError: Cannot read property 'likes' of null
+
+Wed Oct 24 2018 19:46:06 GMT+0530 (India Standard Time) : - TypeError: Cannot read property 'likes' of null
+
+Wed Oct 24 2018 19:48:19 GMT+0530 (India Standard Time) : - TypeError: Cannot read property 'likes' of null
+
+Wed Oct 24 2018 20:00:54 GMT+0530 (India Standard Time) : - TypeError: FavoriteItem.filter is not a function
+
+Wed Oct 24 2018 20:04:12 GMT+0530 (India Standard Time) : - TypeError: FavoriteItem is not a constructor
+
+Wed Oct 24 2018 20:07:46 GMT+0530 (India Standard Time) : - TypeError: FavoriteItem.findOne is not a function
+
+Wed Oct 24 2018 20:08:31 GMT+0530 (India Standard Time) : - TypeError: FavoriteItem.findOne is not a function
+
+Wed Oct 24 2018 20:10:12 GMT+0530 (India Standard Time) : - TypeError: FavoriteItem.findOne is not a function
+
+Wed Oct 24 2018 20:13:48 GMT+0530 (India Standard Time) : - TypeError: Cannot read property '13' of undefined
+
+Wed Oct 24 2018 20:16:51 GMT+0530 (India Standard Time) : - TypeError: Cannot read property '13' of undefined
+
+Wed Oct 24 2018 21:29:01 GMT+0530 (India Standard Time) : - ReferenceError: FavoriteItem1 is not defined
+
+Wed Oct 24 2018 21:29:14 GMT+0530 (India Standard Time) : - ReferenceError: FavoriteItem1 is not defined
+
+Wed Oct 24 2018 21:29:32 GMT+0530 (India Standard Time) : - ReferenceError: FavoriteItem1 is not defined
+
+Wed Oct 24 2018 21:30:12 GMT+0530 (India Standard Time) : - ReferenceError: FavoriteItem1 is not defined
+
+Wed Oct 24 2018 22:05:28 GMT+0530 (India Standard Time) : - TypeError: FavoriteItem.findOne is not a function
+
+Wed Oct 24 2018 22:05:31 GMT+0530 (India Standard Time) : - TypeError: FavoriteItem.findOne is not a function
+
+Wed Oct 24 2018 22:05:55 GMT+0530 (India Standard Time) : - TypeError: FavoriteItem.findOne is not a function
+
+Wed Oct 24 2018 22:15:56 GMT+0530 (India Standard Time) : - Error: listen EADDRINUSE :::8091
+
+Wed Oct 24 2018 22:16:16 GMT+0530 (India Standard Time) : - Error: listen EADDRINUSE :::8091
+
+Wed Oct 24 2018 22:16:22 GMT+0530 (India Standard Time) : - Error: listen EADDRINUSE :::8091
+
+Wed Oct 24 2018 22:17:34 GMT+0530 (India Standard Time) : - Error: listen EADDRINUSE :::8091
+
+Wed Oct 24 2018 22:17:40 GMT+0530 (India Standard Time) : - Error: listen EADDRINUSE :::8091
+
+Wed Oct 24 2018 22:17:44 GMT+0530 (India Standard Time) : - Error: listen EADDRINUSE :::8091

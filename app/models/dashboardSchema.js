@@ -5,8 +5,11 @@ var dashboardSchema = new Schema({
     "type" : String, 
     "did" : Number, 
     "image" : String, 
+	"imageval" : String, 
     "categoryId" : Number, 
-    "itemId" : Number
+    "itemId" : Number,
+    "Rating":Number,
+    "Name":String
 }
 , { collection: 'dashboard' });
 
