@@ -4,7 +4,7 @@ var Schema = mongoose.Schema;
 var addressSchema = new Schema({
     AddId:Number,
     userId:Number,
-    username:Number,
+    username:String,
     street_address: String,
     city:String,
     state:String, 

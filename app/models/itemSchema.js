@@ -6,6 +6,7 @@ var itemSchema = new Schema({
 "itemId" : Number, 
 "name" : String, 
 "displayName" : String, 
+"isAvailable" : Boolean,
 "description" : String, 
 "isNonVeg": Boolean,
 "quantity" : [
@@ -53,6 +54,7 @@ var itemSchema = new Schema({
 ], 
 "likes" : [
     {
+        "userId" : Number,
         "username" : Number, 
         "userfullname" : String, 
         "isLike" : Boolean,

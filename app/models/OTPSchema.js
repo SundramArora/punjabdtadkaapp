@@ -4,10 +4,11 @@ var Schema = mongoose.Schema;
 var OTPSchema = new Schema({
 
     MobileNO:String,    
-    OTP:Number,
+    OTP_Hash:String,
     UserId:Number,
     Status:String,
-    OTP_Date:Date
+    OTP_Date:Date,
+    Attempts:{type:Number, default:0}
 }, { collection: 'OTP' });
 
 module.exports = OTPSchema;

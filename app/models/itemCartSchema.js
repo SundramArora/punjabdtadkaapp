@@ -5,16 +5,18 @@ var itemCartSchema = new Schema({
     "itemDetails":[
         {
             "itemId" : Number, 
-            "Amount" : Number, 
-            "discountApplied" : Number, 
-            "discountAmount" : Number,
-            "itemQuantity":Number   
+            "quantityId" : Number,
+            "itemName" : String,
+            "quantityName" : String,
+            "unitPricePaise" : Number,
+            "lineTotalPaise" : Number,
+            "itemQuantity":Number
     }
     ],
     "couponApplied": Number,
     "totalAmountPaid": Number,
     "taxPaid": Number,
-    "OrderId":Number,
+    "OrderId":String,
     "itemCartId" : Number, 
     "itemCartDate" : Date, 
     "itemTotal" : Number, 
@@ -31,10 +33,15 @@ var itemCartSchema = new Schema({
     ], 
     "taxesTotal" : Number, 
     "NetTotal" : Number, 
+    "currency" : String,
+    "subtotalPaise" : Number,
+    "totalPaise" : Number,
+    "orderId" : String,
+    "checkoutIdempotencyKey" : String,
     "orderStatus":String,
     "paymentMethod":String,
     "userId" : Number,
-    "username":Number
+    "username":String
 }
 , { collection: 'itemCart' });
 

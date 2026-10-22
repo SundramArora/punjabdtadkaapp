@@ -1,9 +1,9 @@
 var mongoose = require('mongoose');
 var crypto = require('crypto');
-var bcrypt = require('bcrypt-nodejs')
-//var config = require('./app/config/config');
+var config = require('../config/config');
 var jwt = require('jsonwebtoken');
 var Schema = mongoose.Schema;
+var passwordIterations = 310000;
 
 var UserSchema = new Schema({
         //_id: String,
@@ -18,7 +18,8 @@ var UserSchema = new Schema({
             unique: true
         },
         password: {
-            type: String
+            type: String,
+            select: false
         },
         firstLogin: {type: Number},
         roles: [{
@@ -35,7 +36,8 @@ var UserSchema = new Schema({
         provider: String,
         isActive: Boolean,   
         salt: String,
-        hash:String 
+        hash:String,
+        passwordIterations: Number
     }, {collection: 'staff'}
 );
 
@@ -82,25 +84,50 @@ var UserSchema = new Schema({
 //     });
 // };
 UserSchema.methods.generateJwt = function() {
-    var expiry = new Date();
-    expiry.setDate(expiry.getDate() + 7);
-  
     return jwt.sign({
       _id: this._id,
       email: this.email,
-      name: this.name,
-      exp: parseInt(expiry.getTime() / 1000),
-    }, "punjabdtadka"); // DO NOT KEEP YOUR SECRET IN THE CODE!
+      name: this.name
+    }, config.secret, { expiresIn: config.tokenLife, algorithm:'HS256' });
   };
 
-  UserSchema.methods.setPassword = function(password){
-    this.salt = crypto.randomBytes(16).toString('hex');
-    this.hash = crypto.pbkdf2Sync(password, this.salt, 1000, 64, 'sha512').toString('hex');
+  UserSchema.methods.setPassword = function(password, callback){
+    var user = this;
+    var salt = crypto.randomBytes(16).toString('hex');
+    crypto.pbkdf2(password, salt, passwordIterations, 64, 'sha512', function(err, hash) {
+      if (err) {
+        return callback(err);
+      }
+      user.salt = salt;
+      user.passwordIterations = passwordIterations;
+      user.hash = hash.toString('hex');
+      callback(null);
+    });
   };
 
-  UserSchema.methods.validPassword = function(password) {
-    var hash = crypto.pbkdf2Sync(password, this.salt, 1000, 64, 'sha512').toString('hex');
-    return this.hash === hash;
+  UserSchema.methods.validPassword = function(password, callback) {
+    var iterations = this.passwordIterations || 1000;
+    if (typeof this.salt !== 'string' || typeof this.hash !== 'string' ||
+        !Number.isSafeInteger(iterations) || iterations < 1 || iterations > 10000000) {
+      return callback(null, false);
+    }
+
+    var storedHash;
+    try {
+      storedHash = Buffer.from(this.hash, 'hex');
+    } catch (error) {
+      return callback(null, false);
+    }
+    if (storedHash.length !== 64) {
+      return callback(null, false);
+    }
+
+    crypto.pbkdf2(password, this.salt, iterations, 64, 'sha512', function(err, hash) {
+      if (err) {
+        return callback(err);
+      }
+      callback(null, crypto.timingSafeEqual(storedHash, hash));
+    });
   };
 
 //   UserSchema.virtual('fullName').get(function() {

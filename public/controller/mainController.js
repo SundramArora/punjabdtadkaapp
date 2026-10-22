@@ -1,36 +1,42 @@
 angular.module('MainController', [])
-
-    .controller('mainController', ['$rootScope','$location','Auth', function($rootScope,$location, Auth) {
-
+  .controller('mainController', ['$location', 'Auth', function($location, Auth) {
     var vm = this;
-
     vm.isLoggedIn = Auth.isLogged();
+    vm.loginData = {};
 
-    $rootScope.$on('$routeChangeStart', function() {
-
-        vm.isLoggedIn = Auth.isLogged();
-            Auth.getUser().then(function(data) {
-                vm.user = data.data;
-            })                              
-        })
-
-
-    vm.login = function() {      
-        vm.error = '';
-
-        Auth.login(vm.loginData.username, vm.loginData.password)
-        .then(function(data) {
-            Auth.getUser()
-            .then(function(data) {
-                vm.user = data.data;
-            });
-
-            if (data.success) {
-                $location.path('/');
-            } else {
-                vm.error = data.message;
-                console.log(vm.error);
-            }
-
-        });
+    function loadUser() {
+      if (!Auth.isLogged()) {
+        vm.user = null;
+        return;
+      }
+      Auth.getUser().then(function(response) {
+        vm.user = response.data;
+      }, function() {
+        vm.user = null;
+        vm.isLoggedIn = false;
+      });
     }
+
+    loadUser();
+
+    vm.login = function() {
+      vm.error = '';
+      Auth.login(vm.loginData.username, vm.loginData.password)
+        .then(function(response) {
+          vm.user = response.data.user;
+          vm.isLoggedIn = true;
+          $location.path('/');
+        }).catch(function(response) {
+          vm.error = response.data && response.data.message
+            ? response.data.message
+            : 'Unable to sign in.';
+        });
+    };
+
+    vm.logout = function() {
+      Auth.logout();
+      vm.user = null;
+      vm.isLoggedIn = false;
+      $location.path('/login');
+    };
+  }]);

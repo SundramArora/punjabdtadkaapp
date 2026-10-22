@@ -7,9 +7,10 @@ var WalletBalanceSchema = new Schema({
     UserId : Number, 
     orderId : Number, 
     walletAmount : Number, 
+    walletAmountPaise : Number,
     expiryDate :Date , 
     alertDay : String,
-    username:Number,
+    username:String,
     walletdate:Date
 }, { collection: 'userWallets' });
 

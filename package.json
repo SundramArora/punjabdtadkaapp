@@ -1,8 +1,11 @@
 {
   "name": "node-api",
-  "main": "pdsBranding.js",
+  "main": "pdt.js",
   "scripts": {
-    "lint": "eslint eslint.config.js app/services/pricing.js test/pricing.test.js"
+    "lint": "eslint eslint.config.js app/services/pricing.js test/pricing.test.js",
+    "test": "node --test",
+    "start": "node pdt.js",
+    "start:branding": "node server.js"
   },
   "dependencies": {
     "async": "^2.6.1",
@@ -35,7 +38,6 @@
     "passport-jwt": "^4.0.0",
     "randomatic": "^3.1.0",
     "simple-node-logger": "^0.93.40",
-    "start": "nodemon pdt.js",
     "twilio": "^3.22.0",
     "unique-random": "^2.0.0",
     "utils": "0.3.1",
@@ -43,9 +45,9 @@
     "winston-daily-rotate-file": "^3.3.2"
   },
   "devDependencies": {
-    "nodemon": "^1.18.4",
     "@eslint/js": "^10.0.1",
     "eslint": "^10.13.0",
-    "globals": "^17.13.0"
+    "globals": "^17.13.0",
+    "nodemon": "^1.18.4"
   }
 }

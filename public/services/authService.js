@@ -5,27 +5,38 @@ authService.factory('Auth', function($http, $location, $q, AuthToken) {
 
     var authFactory = {};
 
-    authFactory.login = function(username,password) {
+    authFactory.isLogged = function() {
+        return Boolean(AuthToken.getToken());
+    };
 
+    authFactory.login = function(username,password) {
         return $http.post('/api/login', {
             username: username,
             password: password
-        }).success(function(data) {
-            AuthToken.setToken(data.token);
-            return data;         
-        })
+        }).then(function(response) {
+            if (!response.data || !response.data.token) {
+                return $q.reject({message:'Authentication response did not include a token.'});
+            }
+            AuthToken.setToken(response.data && response.data.token);
+            return response;
+        });
     }
 
 
     authFactory.getUser = function() {
 
        if (AuthToken.getToken()) {
-           return $http.get('/api/me');
+           return $http.get('/api/me', {
+               headers:{'x-access-token':AuthToken.getToken()}
+           });
        } else {
            return $q.reject({message: 'unable to get data'});
        }
     }
 
+    authFactory.logout = function() {
+        AuthToken.setToken(null);
+    };
 
     return authFactory;
 
@@ -64,9 +75,12 @@ interceptorFactory.request = function(config) {
 };
 
 interceptorFactory.responseError = function(response) {
-      if (response.status === 403) {
+      if (response.status === 401 || response.status === 403) {
+          AuthToken.setToken(null);
           $location.path('/login');
-          return $q.reject(response);
       }
+      return $q.reject(response);
     }
+
+    return interceptorFactory;
 });

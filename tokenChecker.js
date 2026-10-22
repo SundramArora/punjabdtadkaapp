@@ -1,25 +1,26 @@
-const jwt = require('jsonwebtoken')
-//const config = require('./config')
-const config = require('./app/config/config');
+var jwt = require('jsonwebtoken');
+var config = require('./app/config/config');
 
-module.exports = (req,res,next) => {
-  const token = req.body.token || req.query.token || req.headers['x-access-token']
-  // decode token
-  if (token) {
-    // verifies secret and checks exp
-    jwt.verify(token, config.secret, function(err, decoded) {
-        if (err) {
-            return res.status(401).json({"error": true, "message": 'Unauthorized access.' });
-        }
-      req.decoded = decoded;
-      next();
-    });
-  } else {
-    // if there is no token
-    // return an error
-    return res.status(403).send({
-        "error": true,
-        "message": 'No token provided.'
-    });
+module.exports = function(req, res, next) {
+  var authorization = req.headers.authorization;
+  var token = req.headers['x-access-token'];
+
+  if (!token && authorization) {
+    var parts = authorization.split(' ');
+    if (parts.length === 2 && parts[0] === 'Bearer') {
+      token = parts[1];
+    }
   }
-}
+
+  if (!token) {
+    return res.status(401).json({error:true, message:'Authentication required.'});
+  }
+
+  jwt.verify(token, config.secret, {algorithms:['HS256']}, function(err, decoded) {
+    if (err) {
+      return res.status(401).json({error:true, message:'Invalid or expired token.'});
+    }
+    req.decoded = decoded;
+    next();
+  });
+};
