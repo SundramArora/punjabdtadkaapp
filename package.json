@@ -1,6 +1,9 @@
 {
   "name": "node-api",
   "main": "pdsBranding.js",
+  "scripts": {
+    "lint": "eslint eslint.config.js app/services/pricing.js test/pricing.test.js"
+  },
   "dependencies": {
     "async": "^2.6.1",
     "base64-to-image": "^1.0.2",
@@ -40,6 +43,9 @@
     "winston-daily-rotate-file": "^3.3.2"
   },
   "devDependencies": {
-    "nodemon": "^1.18.4"
+    "nodemon": "^1.18.4",
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.13.0",
+    "globals": "^17.13.0"
   }
 }
